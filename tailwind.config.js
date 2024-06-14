@@ -9,6 +9,7 @@ export default {
         'bluefield': '#242A4B',
         'bluesk': '#4663AC',
         'blueres': "#3F3E5D",
+        'blueuser': '#2B80FF',
         'bluesi': '#FFFFFF',
         'darkblue': '#170072',
         'lgtblue': '#0070E0',
