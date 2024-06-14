@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { pipeline } from '@xenova/transformers';
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -18,6 +18,7 @@ function Faq() {
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
   const [chatContent, setChatContent] = useState([]);
+  const textareaRef = useRef(null);
 
   useEffect(() => {
     // Fetch the generative model when the component mounts
@@ -34,6 +35,16 @@ function Faq() {
     };
     fetchModel();
   }, []);
+
+  useEffect(() => {
+    adjustTextareaHeight();
+  }, [prompt]);
+
+  const adjustTextareaHeight = () => {
+    const textarea = textareaRef.current;
+    textarea.style.height = "auto"; // Reset the height
+    textarea.style.height = `${textarea.scrollHeight + 10}px`; // Set it to the scrollHeight
+  };
 
   const getResponse = async () => {
     if (model) {
@@ -104,13 +115,20 @@ function Faq() {
                   <div className="my-5 text-white bg-blueuser p-5 rounded-3xl max-w-[65%]">{content.user}</div>
                 </div>
                 <div className="justify-start flex">
-                  {content.bot ? <div className="my-5 text-white bg-blueres p-5 rounded-3xl max-w-[65%]">{content.bot}</div> : <div className="my-5 text-white bg-bluefield p-5 rounded-3xl max-w-[65%]">Thinking <BeatLoader loading={loading} size={10} color="white" margin={3} /></div>}
+                  {content.bot ? <div className="my-5 text-white bg-blueres p-5 rounded-3xl max-w-[65%]">{content.bot}</div> : <div className="my-5 text-white bg-bluefield p-5 rounded-3xl max-w-[65%]"><BeatLoader loading={loading} size={10} color="white" margin={3} /></div>}
                 </div>
               </div>
             ))}
-            <div className="flex">  
-              <input type="text" placeholder="Type something ..." className="p-3 rounded-xl bg-bluefield text-white min-w-[100vh] font-sans mr-5" value={prompt} onChange={(e) => setPrompt(e.target.value)} />
-              <button onClick={getResponse} disabled={loading} className="rounded-xl text-black bg-white">Send</button>
+            <div className="flex items-center">  
+            <textarea 
+                id="multiliner" 
+                placeholder="Type something ..." 
+                className="px-3 pt-3 rounded-xl bg-bluefield text-white min-w-[100vh] font-sans mr-5 resize-none overflow-hidden" 
+                value={prompt} 
+                onChange={(e) => setPrompt(e.target.value)} 
+                ref={textareaRef}
+              />
+              <button onClick={getResponse} disabled={loading} className="rounded-xl text-black bg-white h-[4rem]">Send</button>
             </div>
           </div>
         </div>
