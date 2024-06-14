@@ -5,6 +5,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 import { env } from '@xenova/transformers';
 import Navbar from '../components/Navbar';
+import { BeatLoader } from "react-spinners";
 
 env.allowLocalModels = false;
 env.useBrowserCache = false;
@@ -22,10 +23,13 @@ function Faq() {
     // Fetch the generative model when the component mounts
     const fetchModel = async () => {
       try {
+        setLoading(true);
         const generativeModel = await genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
         setModel(generativeModel);
       } catch (error) {
         console.error('Error loading generative model:', error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchModel();
@@ -44,8 +48,9 @@ function Faq() {
           ...prevChatContent,
           { user: prompt, bot: "" }
         ]);
-        
-        const result = await model.generateContent(prompt);
+        const tempPrompt = prompt;
+        setPrompt('');
+        const result = await model.generateContent(tempPrompt);
         const res = await result.response;
         const text = await res.text(); // Await the text response
         
@@ -90,21 +95,22 @@ function Faq() {
       
       <div className="w-screen min-h-screen flex font-sans bg-background">
         <Navbar />
+        
         <div className="mx-10 py-5 flex items-end justify-start">
-          <div>
+          <div className="w-[100vh]">
             {chatContent.map((content, index) => (
               <div key={index} className="w-full">
                 <div className="justify-end flex">
-                  <div className="my-5 text-white bg-blueuser p-5 rounded-3xl w-[60%]">{content.user}</div>
+                  <div className="my-5 text-white bg-blueuser p-5 rounded-3xl max-w-[65%]">{content.user}</div>
                 </div>
                 <div className="justify-start flex">
-                  {content.bot && <div className="my-5 text-white bg-blueres p-5 rounded-3xl w-[60%]">{content.bot}</div>}
+                  {content.bot ? <div className="my-5 text-white bg-blueres p-5 rounded-3xl max-w-[65%]">{content.bot}</div> : <div className="my-5 text-white bg-bluefield p-5 rounded-3xl max-w-[65%]">Thinking <BeatLoader loading={loading} size={10} color="white" margin={3} /></div>}
                 </div>
               </div>
             ))}
             <div className="flex">  
               <input type="text" placeholder="Type something ..." className="p-3 rounded-xl bg-bluefield text-white min-w-[100vh] font-sans mr-5" value={prompt} onChange={(e) => setPrompt(e.target.value)} />
-              <button onClick={getResponse} className="rounded-xl text-black bg-white">Send</button>
+              <button onClick={getResponse} disabled={loading} className="rounded-xl text-black bg-white">Send</button>
             </div>
           </div>
         </div>
