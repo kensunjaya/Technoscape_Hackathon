@@ -8,7 +8,7 @@ function Card(props) {
     <>
       <button
         className="flex items-center rounded-3xl bg-bluefield py-5 min-w-full my-3 px-10 overflow-hidden font-sans"
-        onClick={props.handleClick}
+        onClick={() => props.handleClick(props.title)}
       >
         <img
           src={
