@@ -4,10 +4,11 @@ export default {
   theme: {
     extend: {
       colors: {
-        'background': '#EEF5FF',
-        'blues': '#170072',
-        'bluesa': '#D2DAFF',
+        'background': '#222139',
+        'bluenav': '#161A30',
+        'bluefield': '#242A4B',
         'bluesk': '#4663AC',
+        'blueres': "#3F3E5D",
         'bluesi': '#FFFFFF',
         'darkblue': '#170072',
         'lgtblue': '#0070E0',
