@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ["./src/**/*.{js,jsx,ts,tsx}",],
+  content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
       colors: {
@@ -20,7 +20,7 @@ export default {
         'lightblue': '#00B3FF',
       },
       fontFamily: {
-        sans: ['Poppins', 'sans-serif'],
+        sans: ["Poppins", "sans-serif"],
       },
       fontWeight: {
         thin: 100,
@@ -34,11 +34,10 @@ export default {
         black: 900,
       },
       fontStyle: {
-        italic: 'italic',
-        normal: 'normal',
+        italic: "italic",
+        normal: "normal",
       },
     },
   },
   plugins: [],
-}
-
+};
