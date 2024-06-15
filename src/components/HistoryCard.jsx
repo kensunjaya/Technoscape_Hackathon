@@ -6,7 +6,7 @@ function HistoryCard(props) {
         onClick={() => props.handleClick(props.title)}
       >
         <div className="flex flex-col">
-          <p className="justify-start font-regular mx-7 my-5 ml-3 text-lg">
+          <p className="justify-start items-center font-regular mx-7 my-5 ml-3 text-sm">
             {props.description}
           </p>
         </div>
