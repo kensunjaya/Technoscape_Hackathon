@@ -3,9 +3,6 @@ import { pipeline } from "@xenova/transformers";
 import { information } from "../assets/InformationData";
 import MarkdownIt from "markdown-it";
 import Markdown from "../components/Markdown";
-import MarkdownIt from "markdown-it";
-import Markdown from "../components/Markdown";
-
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 import { env } from "@xenova/transformers";
@@ -195,9 +192,9 @@ function Faq() {
         )}
         <Navbar />
 
-        <div className="mx-10 py-5 flex items-end justify-start w-full">
-          <div className="w-full">
-            <div className="w-full">
+        <div className="mx-auto py-5 items-center justify-center">
+          <div className="w-[100vh]">
+            <div className="w-[100vh]">
               <div className="justify-start flex">
                 {displayName !== "" ? (
                   <div className="mb-5 text-white bg-blueres p-5 rounded-3xl max-w-[65%]">{`Halo ${displayName}👋, apa yang bisa saya bantu hari ini mengenai Binus University?`}</div>
@@ -213,31 +210,33 @@ function Faq() {
                 )}
               </div>
             </div>
-            {chatContent.map((content, index) => (
-              <div key={index} className="w-full">
-                <div className="justify-end flex">
-                  <div className="mb-5 text-white bg-blueuser p-5 rounded-3xl max-w-[65%]">
-                    {content.user}
+            <div className="flex-1 overflow-y-auto p-5">
+              {chatContent.map((content, index) => (
+                <div key={index} className="w-full">
+                  <div className="justify-end flex">
+                    <div className="mb-5 text-white bg-blueuser p-5 rounded-3xl max-w-[65%]">
+                      {content.user}
+                    </div>
+                  </div>
+                  <div className="justify-start flex">
+                    {content.bot ? (
+                      <div className="mb-5 text-white bg-blueres p-5 rounded-3xl max-w-[65%]">
+                        <Markdown key={index} markdown={content.bot} />
+                      </div>
+                    ) : (
+                      <div className="my-5 text-white bg-bluefield p-5 rounded-3xl max-w-[65%]">
+                        <BeatLoader
+                          loading={loading}
+                          size={10}
+                          color="white"
+                          margin={3}
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
-                <div className="justify-start flex">
-                  {content.bot ? (
-                    <div className="mb-5 text-white bg-blueres p-5 rounded-3xl max-w-[65%]">
-                      <Markdown key={index} markdown={content.bot} />
-                    </div>
-                  ) : (
-                    <div className="my-5 text-white bg-bluefield p-5 rounded-3xl max-w-[65%]">
-                      <BeatLoader
-                        loading={loading}
-                        size={10}
-                        color="white"
-                        margin={3}
-                      />
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
             <div className="w-full">
               <div className="justify-start flex">
                 {askContinue && (
@@ -245,11 +244,11 @@ function Faq() {
                 )}
               </div>
             </div>
-            <div className="flex items-center">
+            <div className="fixed bottom-0 w-full min-h[4vh] my-4 flex items-center">
               <textarea
                 id="multiliner"
                 placeholder="Type something ..."
-                className="px-3 pt-3 rounded-xl bg-bluefield text-white w-full font-sans mr-5 resize-none overflow-hidden"
+                className="px-3 pt-3 rounded-xl bg-bluefield text-white min-w-[100vh] font-sans mr-5 resize-none overflow-hidden"
                 value={prompt}
                 onKeyDown={handleKeyDown}
                 onChange={(e) => {
