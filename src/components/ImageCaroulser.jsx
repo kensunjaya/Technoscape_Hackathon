@@ -10,7 +10,7 @@ const images = [GambarSatu, GambarDua, GambarTiga];
 function ImageCaroulser() {
   return (
     <>
-      <div className="flex justify-center w-full">
+      <div className="flex justify-center w-full flex-column">
         <div className="box w-full max-w-2xl">
           <Carousel useKeyboardArrows={true} showThumbs={false}>
             {images.map((URL, index) => (

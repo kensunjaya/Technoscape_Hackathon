@@ -19,9 +19,9 @@ function Card(props) {
               : History
           }
           alt="Info University"
-          className="flex-column w-10 h-full mx-7 object-contain rounded-3xl"
+          className="flex-column w-8 h-full mx-7 object-contain"
         />
-        <div className="items-center justify-start font-regular my-5 ml-3 text-xl">
+        <div className="items-center justify-start font-regular mx-7 my-5 ml-3 text-lg">
           {props.title}
         </div>
       </button>

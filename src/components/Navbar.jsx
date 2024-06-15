@@ -14,8 +14,8 @@ function Navbar() {
     }
   };
   return (
-    <nav className=" bg-bluenav min-h-screen pt-10 p-5 w-fit flex justify-center font-sans">
-      <div className="flex flex-col items-center text-center">
+    <nav className=" bg-bluenav min-h-screen pt-10 top-0 left-0 fixed p-5 w-fill flex flex-col font-sans">
+      <div className="flex flex-col text-center ">
         <div className="text-4xl font-semibold mb-10">Dodoru</div>
         <Card title="Info University" handleClick={handleClick} />
         <Card title="FAQ Bot" handleClick={handleClick} />
