@@ -28,7 +28,6 @@ function Faq() {
   const [pageLoading, setPageLoading] = useState(true);
   const [chatContent, setChatContent] = useState([]);
   const [askContinue, setAskContinue] = useState(false);
-  const [end, setEnd] = useState(false);
 
   const textareaRef = useRef(null);
 
@@ -37,6 +36,8 @@ function Faq() {
 
   const navigate = useNavigate();
   const md = new MarkdownIt();
+
+  let classifier = null;
 
   useEffect(() => {
     if (!user) {
@@ -71,6 +72,7 @@ function Faq() {
     const fetchModel = async () => {
       try {
         setLoading(true);
+        classifier = await pipeline("sentiment-analysis");
         const generativeModel = await genAI.getGenerativeModel({
           model: "gemini-1.5-flash",
         });
@@ -95,12 +97,18 @@ function Faq() {
     textarea.style.height = `${textarea.scrollHeight + 10}px`;
   };
 
-  const summarize = async () => {
+  const summarize = async (category) => {
     const chat = model.startChat({
       history: history,
       generationConfig: {},
     });
-    const result = await chat.sendMessage("Summarize the conversation in short sentence using the previous used conversation language. Excluding the name of the user.");
+    let result;
+    if (category) {
+      result = await chat.sendMessage("Describe the category of our conversation in one word only (example: registration).");
+    }
+    else {
+      result = await chat.sendMessage("Please summarize the conversation. Excluding the user's personal information.");
+    }
     const res = await result.response;
     const text = await res.text(); // Await the text response
     console.log(text); // tinggal masukin ke firebase
@@ -125,7 +133,7 @@ function Faq() {
       // Start the second timer
       const newSecondTimeoutId = setTimeout(() => {
         console.log("No response for 20 seconds after the first 30 seconds");
-        summarize();
+        summarize(true);
         // Add any additional actions you want to perform here
       }, 20000); // 10 seconds in milliseconds
 
@@ -187,7 +195,7 @@ function Faq() {
   const getSentiment = async () => {
     try {
       console.log("clicked");
-      const classifier = await pipeline("sentiment-analysis");
+      
       console.log("here");
       const result = await classifier(prompt);
       setSentiment(result[0].label);
