@@ -9,6 +9,7 @@ import Navbar from '../components/Navbar';
 import { BeatLoader } from "react-spinners";
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { set } from 'firebase/database';
 
 env.allowLocalModels = false;
 env.useBrowserCache = false;
@@ -17,19 +18,53 @@ const genAI = new GoogleGenerativeAI("AIzaSyDPBX4bbIvXcupKTOc63rfpqismkktMLeU");
 
 function Faq() {
   const { userData, user } = useContext(AuthContext);
+  const [displayName, setDisplayname] = useState("");
   const [history, setHistory] = useState(information);
 
-  
-  const [response, setResponse] = useState("");
+  const [sentiment, setSentiment] = useState("");
   const [model, setModel] = useState(null);
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
   const [chatContent, setChatContent] = useState([]);
+  const [askContinue, setAskContinue] = useState(false);
   
   const textareaRef = useRef(null);
 
+  const [timeoutId, setTimeoutId] = useState(null); // State to store the timeout ID
+
   const navigate = useNavigate();
+
+  const formatOutput = (text) => {
+    // Split the input text into lines
+    const lines = text.split('\n');
+  
+    // Initialize an empty array to hold the formatted lines
+    let formattedLines = [];
+  
+    // Loop through each line and apply the necessary formatting
+    lines.forEach(line => {
+      // Trim leading and trailing whitespace
+      line = line.trim();
+  
+      // Apply formatting based on the line's content
+      if (line.startsWith('Binus University')) {
+        formattedLines.push(line);
+        formattedLines.push('');
+      } else if (line.startsWith('**')) {
+        formattedLines.push(`### ${line.replace(/\*\*/g, '')}`);
+      } else if (line.startsWith('*')) {
+        formattedLines.push(`- **${line.replace(/(\*\*|\* )/g, '')}**`);
+      } else if (line.startsWith('Diberikan')) {
+        formattedLines[formattedLines.length - 1] += `: ${line}`;
+      } else {
+        formattedLines.push(line);
+      }
+    });
+  
+    // Join the formatted lines back into a single string
+    return formattedLines.join('\n');
+  }
 
   useEffect(() => { 
     if (!user) {
@@ -50,6 +85,7 @@ function Faq() {
           ]
         },
       ])
+      setDisplayname(userData.nama);
     }
   }, []);
 
@@ -82,14 +118,27 @@ function Faq() {
     textarea.style.height = `${textarea.scrollHeight + 10}px`;
   };
 
+  const resetTimer = () => {
+    if (timeoutId) {
+      clearTimeout(timeoutId); // Clear the previous timeout
+    }
+    setAskContinue(false); // Hide the "Ask Continue" message
+    const newTimeoutId = setTimeout(() => {
+      console.log("No response for 30 seconds");
+      setAskContinue(true);
+    }, 30000); // millisec
+
+    setTimeoutId(newTimeoutId); // Set the new timeout ID
+  };
+
   const getResponse = async () => {
     if (model) {
       if (!prompt) {
-        setResponse('Prompt cannot be empty');
         return;
       }
       try {
         setLoading(true);
+        resetTimer();
         // Add the user's prompt to the chat content and history
         setChatContent(prevChatContent => [
           ...prevChatContent,
@@ -101,12 +150,11 @@ function Faq() {
         setPrompt('');
         console.log(newHistory);
 
-        const chat = model.startChat({ history: newHistory, generationConfig: { maxOutputTokens: 250 } });
+        const chat = model.startChat({ history: newHistory, generationConfig: { } });
         const result = await chat.sendMessage(tempPrompt);
         const res = await result.response;
         const text = await res.text(); // Await the text response
 
-        setResponse(text);
         // Update the bot response in the chat content
         setChatContent(prevChatContent => {
           const updatedChatContent = [...prevChatContent];
@@ -120,13 +168,10 @@ function Faq() {
 
       } catch (error) {
         console.error('Error generating content:', error);
-        setResponse('Error: ' + error.message);
       } finally {
         setLoading(false);
         setPrompt('');
       }
-    } else {
-      setResponse('Generative model not loaded');
     }
   };
 
@@ -136,10 +181,17 @@ function Faq() {
       const classifier = await pipeline('sentiment-analysis');
       console.log("here");
       const result = await classifier(prompt);
-      setResponse(result[0].label);
+      setSentiment(result[0].label);
     } catch (error) {
       console.error('Error getting sentiment:', error);
-      setResponse('Error: ' + error.message);
+      setSentiment('Error: ' + error.message);
+    }
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      getResponse();
     }
   };
 
@@ -158,25 +210,41 @@ function Faq() {
         )}
         <Navbar />
         
-        <div className="mx-10 py-5 flex items-end justify-start">
-          <div className="w-[100vh]">
+        <div className="mx-10 py-5 flex items-end justify-start w-full">
+          <div className="w-full">
+              <div className="w-full">
+                <div className="justify-start flex">
+                  {displayName !== "" ? <div className="mb-5 text-white bg-blueres p-5 rounded-3xl max-w-[65%]">{`Halo ${displayName}👋, apa yang bisa saya bantu hari ini mengenai Binus University?`}</div> : <div className="my-5 text-white bg-bluefield p-5 rounded-3xl max-w-[65%]"><BeatLoader loading={true} size={10} color="white" margin={3} /></div>}
+                </div>
+              </div>
             {chatContent.map((content, index) => (
               <div key={index} className="w-full">
                 <div className="justify-end flex">
-                  <div className="my-5 text-white bg-blueuser p-5 rounded-3xl max-w-[65%]">{content.user}</div>
+                  <div className="mb-5 text-white bg-blueuser p-5 rounded-3xl max-w-[65%]">{content.user}</div>
                 </div>
                 <div className="justify-start flex">
-                  {content.bot ? <div className="my-5 text-white bg-blueres p-5 rounded-3xl max-w-[65%]">{content.bot}</div> : <div className="my-5 text-white bg-bluefield p-5 rounded-3xl max-w-[65%]"><BeatLoader loading={loading} size={10} color="white" margin={3} /></div>}
+                  {content.bot ? <div className="mb-5 text-white bg-blueres p-5 rounded-3xl max-w-[65%]">{content.bot}</div> : <div className="my-5 text-white bg-bluefield p-5 rounded-3xl max-w-[65%]"><BeatLoader loading={loading} size={10} color="white" margin={3} /></div>}
                 </div>
               </div>
             ))}
+              <div className="w-full">
+                <div className="justify-start flex">
+                  {askContinue && <div className="mb-5 text-white bg-blueres p-5 rounded-3xl max-w-[65%]">{`${displayName}, apakah masih ada yang ingin Anda tanyakan? 😊`}</div>}
+                </div>
+              </div>
             <div className="flex items-center">  
               <textarea 
                 id="multiliner" 
                 placeholder="Type something ..." 
-                className="px-3 pt-3 rounded-xl bg-bluefield text-white min-w-[100vh] font-sans mr-5 resize-none overflow-hidden" 
+                className="px-3 pt-3 rounded-xl bg-bluefield text-white w-full font-sans mr-5 resize-none overflow-hidden" 
                 value={prompt} 
-                onChange={(e) => setPrompt(e.target.value)} 
+                onKeyDown={handleKeyDown}
+                onChange={(e) => {
+                  setPrompt(e.target.value);
+                  if (chatContent.length > 0) {
+                    resetTimer();
+                  }
+                }} 
                 ref={textareaRef}
               />
               <button onClick={getResponse} disabled={loading} className="rounded-xl text-black bg-white h-[4rem]">Send</button>

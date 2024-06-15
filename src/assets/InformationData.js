@@ -23,6 +23,18 @@ export const information =
       parts: [
         { text: "Baik, mulai dari sekarang saya akan hanya membahas seputar Bina Nusantara University. Saya tidak akan menjawab pertanyaan di luar topik Binus University"}
       ]
+    },
+    {
+      role: "user",
+      parts: [
+        { text: "Saya ingin Anda mengerti semua bahasa yang saya gunakan. Apakah Anda mengerti?"}
+      ]
+    },
+    {
+      role: "model",
+      parts: [
+        { text: "Baik, dimengerti. Saya akan mencoba untuk memahami semua bahasa yang Anda gunakan"}
+      ]
     }
     // ini nanti diisi sama info info binus
   ]
