@@ -1,15 +1,14 @@
-
-import React, { useContext, useEffect, useRef, useState } from 'react';
-import { pipeline } from '@xenova/transformers';
-import { information } from '../assets/InformationData';
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { pipeline } from "@xenova/transformers";
+import { information } from "../assets/InformationData";
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 import { env } from "@xenova/transformers";
 import Navbar from "../components/Navbar";
 import { BeatLoader } from "react-spinners";
-import { AuthContext } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { AuthContext } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 env.allowLocalModels = false;
 env.useBrowserCache = false;
@@ -20,40 +19,42 @@ function Faq() {
   const { userData, user } = useContext(AuthContext);
   const [history, setHistory] = useState(information);
 
-  
   const [response, setResponse] = useState("");
   const [model, setModel] = useState(null);
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
   const [chatContent, setChatContent] = useState([]);
-  
+
   const textareaRef = useRef(null);
 
   const navigate = useNavigate();
 
-  useEffect(() => { 
+  useEffect(() => {
     if (!user) {
       navigate("/signin");
-    }
-    else {
-      setHistory([...history, 
+    } else {
+      setHistory([
+        ...history,
         {
           role: "user",
           parts: [
-            { text: `Data diri: Nama Lengkap: ${userData.nama}, Email: ${userData.email}`}
-          ]
+            {
+              text: `Data diri: Nama Lengkap: ${userData.nama}, Email: ${userData.email}`,
+            },
+          ],
         },
         {
           role: "model",
           parts: [
-            { text: "Data diri berhasil kami ingat, Kami akan memberikan informasi seputar Binus University"}
-          ]
+            {
+              text: "Data diri berhasil kami ingat, Kami akan memberikan informasi seputar Binus University",
+            },
+          ],
         },
-      ])
+      ]);
     }
   }, []);
-
 
   useEffect(() => {
     // Fetch the generative model when the component mounts
@@ -107,8 +108,10 @@ function Faq() {
         setPrompt("");
         console.log(newHistory);
 
-
-        const chat = model.startChat({ history: newHistory, generationConfig: { } });
+        const chat = model.startChat({
+          history: newHistory,
+          generationConfig: {},
+        });
 
         const result = await chat.sendMessage(tempPrompt);
         const res = await result.response;
@@ -151,7 +154,6 @@ function Faq() {
   };
 
   return (
-    
     <>
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" />
@@ -160,42 +162,44 @@ function Faq() {
         rel="stylesheet"
       ></link>
 
-      <div className="w-screen min-h-screen flex font-sans bg-background">
+      <div className="w-screen min-h-screen flex flex-col font-sans bg-background m">
         {pageLoading && (
           <div className="absolute inset-0 flex items-center justify-center bg-opacity-50 bg-black">
-            <BeatLoader loading={loading} size={25} color="white" margin={5}/>
+            <BeatLoader loading={loading} size={25} color="white" margin={5} />
           </div>
         )}
         <Navbar />
-        
-        <div className="mx-10 py-5 flex items-end justify-start">
+
+        <div className="py-5 items-center justify-center mx-auto">
           <div className="w-[100vh]">
-            {chatContent.map((content, index) => (
-              <div key={index} className="w-full">
-                <div className="justify-end flex">
-                  <div className="my-5 text-white bg-blueuser p-5 rounded-3xl max-w-[65%]">
-                    {content.user}
+            <div className="flex-1 overflow-y-auto p-5">
+              {chatContent.map((content, index) => (
+                <div key={index} className="w-full">
+                  <div className="justify-end flex">
+                    <div className="my-5 text-white bg-blueuser p-5 rounded-3xl max-w-[65%]">
+                      {content.user}
+                    </div>
+                  </div>
+                  <div className="justify-start flex">
+                    {content.bot ? (
+                      <div className="my-5 text-white bg-blueres p-5 rounded-3xl max-w-[65%]">
+                        {content.bot}
+                      </div>
+                    ) : (
+                      <div className="my-5 text-white bg-bluefield p-5 rounded-3xl max-w-[65%]">
+                        <BeatLoader
+                          loading={loading}
+                          size={10}
+                          color="white"
+                          margin={3}
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
-                <div className="justify-start flex">
-                  {content.bot ? (
-                    <div className="my-5 text-white bg-blueres p-5 rounded-3xl max-w-[65%]">
-                      {content.bot}
-                    </div>
-                  ) : (
-                    <div className="my-5 text-white bg-bluefield p-5 rounded-3xl max-w-[65%]">
-                      <BeatLoader
-                        loading={loading}
-                        size={10}
-                        color="white"
-                        margin={3}
-                      />
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-            <div className="flex items-center">
+              ))}
+            </div>
+            <div className="fixed bottom-0 w-full min-h[4vh] my-4 flex items-center">
               <textarea
                 id="multiliner"
                 placeholder="Type something ..."
@@ -207,7 +211,7 @@ function Faq() {
               <button
                 onClick={getResponse}
                 disabled={loading}
-                className="rounded-xl text-black bg-white h-[4rem]"
+                className="rounded-xl text-black bg-white h-[4rem] px-5"
               >
                 Send
               </button>
