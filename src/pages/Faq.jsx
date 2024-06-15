@@ -28,10 +28,12 @@ function Faq() {
   const [pageLoading, setPageLoading] = useState(true);
   const [chatContent, setChatContent] = useState([]);
   const [askContinue, setAskContinue] = useState(false);
+  const [end, setEnd] = useState(false);
 
   const textareaRef = useRef(null);
 
   const [timeoutId, setTimeoutId] = useState(null); // State to store the timeout ID
+  const [secondTimeoutId, setSecondTimeoutId] = useState(null); // State to store the second timeout ID
 
   const navigate = useNavigate();
   const md = new MarkdownIt();
@@ -93,15 +95,42 @@ function Faq() {
     textarea.style.height = `${textarea.scrollHeight + 10}px`;
   };
 
-  const resetTimer = () => {
+  const summarize = async () => {
+    const chat = model.startChat({
+      history: history,
+      generationConfig: {},
+    });
+    const result = await chat.sendMessage("Summarize the conversation in short sentence using the previous used conversation language.");
+    const res = await result.response;
+    const text = await res.text(); // Await the text response
+    console.log(text); // tinggal masukin ke firebase
+  };
+
+  const resetTimers = () => {
     if (timeoutId) {
       clearTimeout(timeoutId); // Clear the previous timeout
     }
+    if (secondTimeoutId) {
+      clearTimeout(secondTimeoutId); // Clear the second timeout if it exists
+    }
     setAskContinue(false); // Hide the "Ask Continue" message
+  };
+
+  const resetTimer = () => {
+    resetTimers();
     const newTimeoutId = setTimeout(() => {
       console.log("No response for 30 seconds");
       setAskContinue(true);
-    }, 30000); // millisec
+
+      // Start the second timer
+      const newSecondTimeoutId = setTimeout(() => {
+        console.log("No response for 20 seconds after the first 30 seconds");
+        summarize();
+        // Add any additional actions you want to perform here
+      }, 20000); // 10 seconds in milliseconds
+
+      setSecondTimeoutId(newSecondTimeoutId);
+    }, 30000); // 30 seconds in milliseconds
 
     setTimeoutId(newTimeoutId); // Set the new timeout ID
   };
@@ -193,8 +222,8 @@ function Faq() {
         <Navbar />
 
         <div className="mx-auto py-5 items-center justify-center">
-          <div className="w-[100vh]">
-            <div className="w-[100vh]">
+          <div className="w-[100vh] mb-20">
+            <div className="w-full">
               <div className="justify-start flex">
                 {displayName !== "" ? (
                   <div className="mb-5 text-white bg-blueres p-5 rounded-3xl max-w-[65%]">{`Halo ${displayName}👋, apa yang bisa saya bantu hari ini mengenai Binus University?`}</div>
@@ -210,7 +239,7 @@ function Faq() {
                 )}
               </div>
             </div>
-            <div className="flex-1 overflow-y-auto p-5">
+            <div className="flex-1 overflow-y-auto w-full">
               {chatContent.map((content, index) => (
                 <div key={index} className="w-full">
                   <div className="justify-end flex">

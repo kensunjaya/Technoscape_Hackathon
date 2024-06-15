@@ -69,7 +69,7 @@ const SignUp = () =>{
         <div className="font-semibold text-center text-lg pb-5">Sign Up</div>
         {loading && (
           <div className="absolute inset-0 flex items-center justify-center bg-opacity-50 bg-black">
-            <BeatLoader loading={loading} size={50} color="white" margin={10}/>
+            <BeatLoader loading={loading} size={25} color="white" margin={5}/>
           </div>
         )}
 
