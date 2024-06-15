@@ -79,7 +79,7 @@ const Login = () =>{
           </button>
           <div className="flex pt-3">
             <div className="pr-2 text-sm">Don't have an account? </div>
-            <Link to="/signin" className="text-white text-sm underline">Register here</Link>
+            <Link to="/signup" className="text-white text-sm underline">Register here</Link>
           </div>
         </div>
       </form>

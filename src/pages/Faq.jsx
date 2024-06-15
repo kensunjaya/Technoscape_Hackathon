@@ -1,15 +1,15 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
-import { pipeline } from '@xenova/transformers';
-import { information } from '../assets/InformationData';
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { pipeline } from "@xenova/transformers";
+import { information } from "../assets/InformationData";
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-import { env } from '@xenova/transformers';
-import Navbar from '../components/Navbar';
+import { env } from "@xenova/transformers";
+import Navbar from "../components/Navbar";
 import { BeatLoader } from "react-spinners";
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { set } from 'firebase/database';
+
 
 env.allowLocalModels = false;
 env.useBrowserCache = false;
@@ -35,60 +35,32 @@ function Faq() {
 
   const navigate = useNavigate();
 
-  const formatOutput = (text) => {
-    // Split the input text into lines
-    const lines = text.split('\n');
-  
-    // Initialize an empty array to hold the formatted lines
-    let formattedLines = [];
-  
-    // Loop through each line and apply the necessary formatting
-    lines.forEach(line => {
-      // Trim leading and trailing whitespace
-      line = line.trim();
-  
-      // Apply formatting based on the line's content
-      if (line.startsWith('Binus University')) {
-        formattedLines.push(line);
-        formattedLines.push('');
-      } else if (line.startsWith('**')) {
-        formattedLines.push(`### ${line.replace(/\*\*/g, '')}`);
-      } else if (line.startsWith('*')) {
-        formattedLines.push(`- **${line.replace(/(\*\*|\* )/g, '')}**`);
-      } else if (line.startsWith('Diberikan')) {
-        formattedLines[formattedLines.length - 1] += `: ${line}`;
-      } else {
-        formattedLines.push(line);
-      }
-    });
-  
-    // Join the formatted lines back into a single string
-    return formattedLines.join('\n');
-  }
-
-  useEffect(() => { 
+  useEffect(() => {
     if (!user) {
       navigate("/signin");
-    }
-    else {
-      setHistory([...history, 
+    } else {
+      setHistory([
+        ...history,
         {
           role: "user",
           parts: [
-            { text: `Data diri: Nama Lengkap: ${userData.nama}, Email: ${userData.email}`}
-          ]
+            {
+              text: `Data diri: Nama Lengkap: ${userData.nama}, Email: ${userData.email}`,
+            },
+          ],
         },
         {
           role: "model",
           parts: [
-            { text: "Data diri berhasil kami ingat, Kami akan memberikan informasi seputar Binus University"}
-          ]
+            {
+              text: "Data diri berhasil kami ingat, Kami akan memberikan informasi seputar Binus University",
+            },
+          ],
         },
       ])
       setDisplayname(userData.nama);
     }
   }, []);
-
 
   useEffect(() => {
     // Fetch the generative model when the component mounts
@@ -96,10 +68,12 @@ function Faq() {
     const fetchModel = async () => {
       try {
         setLoading(true);
-        const generativeModel = await genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const generativeModel = await genAI.getGenerativeModel({
+          model: "gemini-1.5-flash",
+        });
         setModel(generativeModel);
       } catch (error) {
-        console.error('Error loading generative model:', error);
+        console.error("Error loading generative model:", error);
       } finally {
         setLoading(false);
         setPageLoading(false);
@@ -140,14 +114,17 @@ function Faq() {
         setLoading(true);
         resetTimer();
         // Add the user's prompt to the chat content and history
-        setChatContent(prevChatContent => [
+        setChatContent((prevChatContent) => [
           ...prevChatContent,
-          { user: prompt, bot: "" }
+          { user: prompt, bot: "" },
         ]);
-        const newHistory = [...history, { role: "user", parts: [{ text: prompt }] }];
+        const newHistory = [
+          ...history,
+          { role: "user", parts: [{ text: prompt }] },
+        ];
         setHistory(newHistory);
         const tempPrompt = prompt;
-        setPrompt('');
+        setPrompt("");
         console.log(newHistory);
 
         const chat = model.startChat({ history: newHistory, generationConfig: { } });
@@ -156,21 +133,20 @@ function Faq() {
         const text = await res.text(); // Await the text response
 
         // Update the bot response in the chat content
-        setChatContent(prevChatContent => {
+        setChatContent((prevChatContent) => {
           const updatedChatContent = [...prevChatContent];
           updatedChatContent[updatedChatContent.length - 1].bot = text;
           return updatedChatContent;
         });
-        setHistory(prevHistory => [
+        setHistory((prevHistory) => [
           ...prevHistory,
-          { role: "model", parts: [{ text: text }] }
+          { role: "model", parts: [{ text: text }] },
         ]);
-
       } catch (error) {
         console.error('Error generating content:', error);
       } finally {
         setLoading(false);
-        setPrompt('');
+        setPrompt("");
       }
     }
   };
@@ -178,7 +154,7 @@ function Faq() {
   const getSentiment = async () => {
     try {
       console.log("clicked");
-      const classifier = await pipeline('sentiment-analysis');
+      const classifier = await pipeline("sentiment-analysis");
       console.log("here");
       const result = await classifier(prompt);
       setSentiment(result[0].label);
@@ -196,16 +172,18 @@ function Faq() {
   };
 
   return (
-    
     <>
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" />
-      <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet"></link>
-      
-      <div className="w-screen min-h-screen flex font-sans bg-background">
+      <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet"
+      ></link>
+
+      <div className="w-screen min-h-screen flex flex-col font-sans bg-background m">
         {pageLoading && (
           <div className="absolute inset-0 flex items-center justify-center bg-opacity-50 bg-black">
-            <BeatLoader loading={loading} size={25} color="white" margin={5}/>
+            <BeatLoader loading={loading} size={25} color="white" margin={5} />
           </div>
         )}
         <Navbar />
@@ -247,7 +225,13 @@ function Faq() {
                 }} 
                 ref={textareaRef}
               />
-              <button onClick={getResponse} disabled={loading} className="rounded-xl text-black bg-white h-[4rem]">Send</button>
+              <button
+                onClick={getResponse}
+                disabled={loading}
+                className="rounded-xl text-black bg-white h-[4rem] px-5"
+              >
+                Send
+              </button>
             </div>
           </div>
         </div>
