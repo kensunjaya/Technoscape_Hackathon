@@ -4,6 +4,8 @@ import { information } from "../assets/InformationData";
 import MarkdownIt from "markdown-it";
 import Markdown from "../components/Markdown";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { db } from "../firebaseSetup";
+import { doc, updateDoc } from "firebase/firestore";
 
 import { env } from "@xenova/transformers";
 import Navbar from "../components/Navbar";
@@ -106,14 +108,29 @@ function Faq() {
     });
     let result;
     if (category) {
-      result = await chat.sendMessage("Describe the category of our conversation in one word only (example: registration).");
-    }
-    else {
-      result = await chat.sendMessage("Please summarize the conversation in our conversation language. Excluding the user's personal information.");
+      result = await chat.sendMessage(
+        "Describe the category of our conversation in one word only (example: registration)."
+      );
+    } else {
+      result = await chat.sendMessage(
+        "Please summarize the conversation in one paragraph only and in language what user's asked (so if the question is asked in indonesian, then the summary must also in indonesian) There's no need to state all the rules that I have prompted"
+      );
     }
     const res = await result.response;
     const text = await res.text(); // Await the text response
     console.log(text); // tinggal masukin ke firebase
+    try {
+      const userDocRef = doc(db, "users", userData.email); // Get a reference to the user's document
+      let tempRiwayat = userData.riwayat;
+      console.log(typeof tempRiwayat);
+      tempRiwayat.push(text);
+      await updateDoc(userDocRef, {
+        riwayat: tempRiwayat, // Update the riwayat field with the summarized result
+      });
+      console.log("User riwayat updated successfully");
+    } catch (error) {
+      console.error("Error updating user riwayat:", error);
+    }
   };
 
   const resetTimers = () => {
@@ -135,7 +152,7 @@ function Faq() {
       // Start the second timer
       const newSecondTimeoutId = setTimeout(() => {
         console.log("No response for 20 seconds after the first 30 seconds");
-        summarize(true);
+        summarize(false);
         // Add any additional actions you want to perform here
       }, 20000); // 10 seconds in milliseconds
 
@@ -202,7 +219,7 @@ function Faq() {
   const getSentiment = async () => {
     try {
       console.log("clicked");
-      
+
       console.log("here");
       const result = await classifier(prompt);
       setSentiment(result[0].label);
