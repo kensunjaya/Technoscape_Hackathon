@@ -73,8 +73,8 @@ function Faq() {
 
     const fetchModel = async () => {
       try {
-        setLoading(true);
-        classifier = await pipeline("sentiment-analysis");
+        setPageLoading(true);
+        // classifier = await pipeline("sentiment-analysis");
         const generativeModel = await genAI.getGenerativeModel({
           model: "gemini-1.5-flash",
         });
@@ -241,7 +241,12 @@ function Faq() {
       <div className="w-screen min-h-screen flex flex-col font-sans bg-background">
         {pageLoading && (
           <div className="absolute inset-0 flex items-center justify-center bg-opacity-50 bg-black">
-            <BeatLoader loading={loading} size={25} color="white" margin={5} />
+            <BeatLoader
+              loading={pageLoading}
+              size={25}
+              color="white"
+              margin={5}
+            />
           </div>
         )}
         <Navbar />

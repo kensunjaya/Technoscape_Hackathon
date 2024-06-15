@@ -1,6 +1,11 @@
+import React, { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 import Navbar from "../components/Navbar";
+import HistoryCard from "../components/HistoryCard";
 
 function History() {
+  const { userData } = useContext(AuthContext);
+
   return (
     <>
       <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -10,10 +15,18 @@ function History() {
         rel="stylesheet"
       ></link>
       <div className="w-screen min-h-screen flex font-sans bg-background">
-        <div className="mr-64">
-          <Navbar />
+        <Navbar />
+        <div className="flex flex-col items-center justify-start flex-grow ml-64">
+          <div>
+            {userData.riwayat && userData.riwayat.length > 0 ? (
+              userData.riwayat.map((item, index) => (
+                <HistoryCard key={index} description={item} />
+              ))
+            ) : (
+              <p>No history available.</p>
+            )}
+          </div>
         </div>
-        <History description="Sherly" />
       </div>
     </>
   );
