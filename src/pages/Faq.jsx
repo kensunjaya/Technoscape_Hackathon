@@ -1,12 +1,15 @@
-import React, { useEffect, useRef, useState } from "react";
-import { pipeline } from "@xenova/transformers";
-import { information } from "../assets/InformationData";
+
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { pipeline } from '@xenova/transformers';
+import { information } from '../assets/InformationData';
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 import { env } from "@xenova/transformers";
 import Navbar from "../components/Navbar";
 import { BeatLoader } from "react-spinners";
+import { AuthContext } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 env.allowLocalModels = false;
 env.useBrowserCache = false;
@@ -14,16 +17,47 @@ env.useBrowserCache = false;
 const genAI = new GoogleGenerativeAI("AIzaSyDPBX4bbIvXcupKTOc63rfpqismkktMLeU");
 
 function Faq() {
+  const { userData, user } = useContext(AuthContext);
+  const [history, setHistory] = useState(information);
+
+  
   const [response, setResponse] = useState("");
   const [model, setModel] = useState(null);
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
+  const [pageLoading, setPageLoading] = useState(true);
   const [chatContent, setChatContent] = useState([]);
-  const [history, setHistory] = useState(information);
+  
   const textareaRef = useRef(null);
+
+  const navigate = useNavigate();
+
+  useEffect(() => { 
+    if (!user) {
+      navigate("/signin");
+    }
+    else {
+      setHistory([...history, 
+        {
+          role: "user",
+          parts: [
+            { text: `Data diri: Nama Lengkap: ${userData.nama}, Email: ${userData.email}`}
+          ]
+        },
+        {
+          role: "model",
+          parts: [
+            { text: "Data diri berhasil kami ingat, Kami akan memberikan informasi seputar Binus University"}
+          ]
+        },
+      ])
+    }
+  }, []);
+
 
   useEffect(() => {
     // Fetch the generative model when the component mounts
+
     const fetchModel = async () => {
       try {
         setLoading(true);
@@ -35,6 +69,7 @@ function Faq() {
         console.error("Error loading generative model:", error);
       } finally {
         setLoading(false);
+        setPageLoading(false);
       }
     };
     fetchModel();
@@ -72,10 +107,9 @@ function Faq() {
         setPrompt("");
         console.log(newHistory);
 
-        const chat = model.startChat({
-          history: newHistory,
-          generationConfig: { maxOutputTokens: 200 },
-        });
+
+        const chat = model.startChat({ history: newHistory, generationConfig: { } });
+
         const result = await chat.sendMessage(tempPrompt);
         const res = await result.response;
         const text = await res.text(); // Await the text response
@@ -117,6 +151,7 @@ function Faq() {
   };
 
   return (
+    
     <>
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" />
@@ -126,10 +161,14 @@ function Faq() {
       ></link>
 
       <div className="w-screen min-h-screen flex font-sans bg-background">
-        <div className="mr-64">
-          <Navbar />
-        </div>
-        <div className="mx-64 py-5 flex items-end justify-start">
+        {pageLoading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-opacity-50 bg-black">
+            <BeatLoader loading={loading} size={25} color="white" margin={5}/>
+          </div>
+        )}
+        <Navbar />
+        
+        <div className="mx-10 py-5 flex items-end justify-start">
           <div className="w-[100vh]">
             {chatContent.map((content, index) => (
               <div key={index} className="w-full">
