@@ -4,13 +4,14 @@ import InfoUniversity from "../assets/InfoUniversity.png";
 import Faq from "../assets/FAQ.png";
 import History from "../assets/History.png";
 import Logout from "../assets/Logout.png";
+import Dashboard from "../assets/Dashboard.png";
 
 function Card(props) {
   const location = useLocation();
 
   const pathMapping = {
     "/info": "Info University",
-    "/": "FAQ Bot",
+    "/": "Chat Bot",
     "/history": "History",
   };
 
@@ -28,8 +29,10 @@ function Card(props) {
           src={
             props.title === "Info University"
               ? InfoUniversity
-              : props.title === "FAQ Bot"
+              : props.title === "Chat Bot"
               ? Faq
+              : props.title === "Dashboard"
+              ? Dashboard
               : props.title === "History"
               ? History
               : Logout

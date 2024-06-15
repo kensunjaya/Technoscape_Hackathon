@@ -3,15 +3,11 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../firebaseSetup";
 
-function Navbar() {
+function NavbarAdmin() {
   const navigate = useNavigate();
   const handleClick = (title) => {
-    if (title === "Info University") {
-      navigate("/info");
-    } else if (title === "Chat Bot") {
-      navigate("/");
-    } else if (title === "History") {
-      navigate("/history");
+    if (title === "Dashboard") {
+      navigate("/admin");
     } else {
       auth.signOut();
       navigate("/signin");
@@ -21,13 +17,11 @@ function Navbar() {
     <nav className=" bg-bluenav min-h-screen pt-10 top-0 left-0 fixed p-5 w-fill flex flex-col font-sans">
       <div className="flex flex-col text-center ">
         <div className="text-4xl font-semibold mb-10">Dodoru</div>
-        <Card title="Info University" handleClick={handleClick} />
-        <Card title="Chat Bot" handleClick={handleClick} />
-        <Card title="History" handleClick={handleClick} />
         <Card title="Logout" handleClick={handleClick} />
+        <div className="my-10">Logged in as admin</div>
       </div>
     </nav>
   );
 }
 
-export default Navbar;
+export default NavbarAdmin;

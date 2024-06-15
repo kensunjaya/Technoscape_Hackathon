@@ -5,13 +5,14 @@ import MarkdownIt from "markdown-it";
 import Markdown from "../components/Markdown";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { db } from "../firebaseSetup";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 
 import { env } from "@xenova/transformers";
 import Navbar from "../components/Navbar";
 import { BeatLoader } from "react-spinners";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { set } from "firebase/database";
 
 env.allowLocalModels = false;
 // env.useBrowserCache = false;
@@ -19,7 +20,7 @@ env.allowLocalModels = false;
 const genAI = new GoogleGenerativeAI("AIzaSyDPBX4bbIvXcupKTOc63rfpqismkktMLeU");
 
 function Faq() {
-  const { userData, user } = useContext(AuthContext);
+  const { userData, user, contactHistory, setContactHistory } = useContext(AuthContext);
   const [displayName, setDisplayname] = useState("");
   const [history, setHistory] = useState(information);
 
@@ -30,6 +31,7 @@ function Faq() {
   const [pageLoading, setPageLoading] = useState(true);
   const [chatContent, setChatContent] = useState([]);
   const [askContinue, setAskContinue] = useState(false);
+  const [timeoutEnabled, setTimeoutEnabled] = useState(true); // State to enable/disable the timeout
 
   const textareaRef = useRef(null);
 
@@ -40,6 +42,26 @@ function Faq() {
   const md = new MarkdownIt();
 
   // let classifier = null;
+
+  const getHistory = async () => {
+    try {
+      setPageLoading(true);
+      const docRef = doc(db, "histories", "binus");
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        console.log(docSnap.data())
+        setContactHistory(docSnap.data());
+      } else {
+        console.log("Data does not exist in database!");
+        setContactHistory(null);
+      }
+    } catch (e) {
+      console.error("Error getting document:", e);
+      setContactHistory(null);
+    } finally {
+      setPageLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (!user) {
@@ -65,6 +87,7 @@ function Faq() {
         },
       ]);
       setDisplayname(userData.nama);
+      getHistory();
     }
   }, []);
 
@@ -106,26 +129,37 @@ function Faq() {
       generationConfig: {},
     });
     let result;
+    let sentiment;
     if (category) {
       result = await chat.sendMessage(
         "Describe the category of our conversation in one word only (example: registration)."
       );
     } else {
       result = await chat.sendMessage(
-        "Please summarize the conversation in one paragraph only and in language what user's asked (so if the question is asked in indonesian, then the summary must also in indonesian) There's no need to state all the rules that I have prompted"
+        "Please summarize the conversation topic in one paragraph only and in language what user's asked (so if the question is asked in indonesian, then the summary must also in indonesian). DO NOT INCLUDE the user's personal data such as email and name."
       );
+      sentiment = await chat.sendMessage(
+        "Based on the conversation, was my mood positive or negative? Please answer with positive or negative only. One word"
+      )
     }
     const res = await result.response;
+    const res2 = await sentiment.response;
     const text = await res.text(); // Await the text response
-    console.log(text); // tinggal masukin ke firebase
+    const sen = await res2.text();
+    // console.log(text); // tinggal masukin ke firebase
     try {
       const userDocRef = doc(db, "users", userData.email); // Get a reference to the user's document
+      const historyDocRef = doc(db, "histories", "binus"); // Get a reference to the user's history document
+      let tempHistory = contactHistory.chat;
       let tempRiwayat = userData.riwayat;
-      console.log(typeof tempRiwayat);
       tempRiwayat.push(text);
+      tempHistory.push({content: text, sentiment: sen })
       await updateDoc(userDocRef, {
         riwayat: tempRiwayat, // Update the riwayat field with the summarized result
       });
+      await updateDoc(historyDocRef, {
+        chat: tempHistory, // Update the chat field with the summarized result
+      })
       console.log("User riwayat updated successfully");
     } catch (error) {
       console.error("Error updating user riwayat:", error);
@@ -151,9 +185,14 @@ function Faq() {
       // Start the second timer
       const newSecondTimeoutId = setTimeout(() => {
         console.log("No response for 20 seconds after the first 30 seconds");
-        summarize(false);
+        if (timeoutEnabled) {
+          setTimeoutEnabled(false);
+          summarize(false);
+          alert("Thank you for chatting with me! Open history tab to see the conversation summary.");
+          navigate("/info");
+        }
         // Add any additional actions you want to perform here
-      }, 20000); // 10 seconds in milliseconds
+      }, 20000); // 20 seconds in milliseconds
 
       setSecondTimeoutId(newSecondTimeoutId);
     }, 30000); // 30 seconds in milliseconds
@@ -315,6 +354,7 @@ function Faq() {
                 onChange={(e) => {
                   setPrompt(e.target.value);
                   if (chatContent.length > 0) {
+                    setTimeoutEnabled(true);
                     resetTimer();
                   }
                 }}
@@ -326,6 +366,20 @@ function Faq() {
                 className="rounded-xl text-black bg-white h-[4rem] px-5"
               >
                 Send
+              </button>
+              <button
+                onClick={
+                  () => {
+                    setTimeoutEnabled(false);
+                    summarize(false);
+                    alert("Thank you for chatting with me! Open history tab to see the conversation summary.");
+                    navigate("/info");
+                  }
+                }
+                disabled={loading}
+                className="ml-5 rounded-xl text-red-500 bg-background border-[2px] border-red-500 h-[4rem] px-5"
+              >
+                End Chat
               </button>
             </div>
           </div>
