@@ -74,7 +74,7 @@ function Faq() {
     const fetchModel = async () => {
       try {
         setPageLoading(true);
-        classifier = await pipeline("sentiment-analysis");
+        // classifier = await pipeline("sentiment-analysis");
         const generativeModel = await genAI.getGenerativeModel({
           model: "gemini-1.5-flash",
         });
