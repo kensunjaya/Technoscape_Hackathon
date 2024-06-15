@@ -1,6 +1,8 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { pipeline } from "@xenova/transformers";
 import { information } from "../assets/InformationData";
+import MarkdownIt from "markdown-it";
+import Markdown from "../components/Markdown";
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
@@ -34,6 +36,7 @@ function Faq() {
   const [timeoutId, setTimeoutId] = useState(null); // State to store the timeout ID
 
   const navigate = useNavigate();
+  const md = new MarkdownIt();
 
   useEffect(() => {
     if (!user) {
@@ -180,7 +183,7 @@ function Faq() {
         rel="stylesheet"
       ></link>
 
-      <div className="w-screen min-h-screen flex flex-col font-sans bg-background m">
+      <div className="w-screen min-h-screen flex flex-col font-sans bg-background">
         {pageLoading && (
           <div className="absolute inset-0 flex items-center justify-center bg-opacity-50 bg-black">
             <BeatLoader loading={loading} size={25} color="white" margin={5} />
@@ -201,7 +204,7 @@ function Faq() {
                   <div className="mb-5 text-white bg-blueuser p-5 rounded-3xl max-w-[65%]">{content.user}</div>
                 </div>
                 <div className="justify-start flex">
-                  {content.bot ? <div className="mb-5 text-white bg-blueres p-5 rounded-3xl max-w-[65%]">{content.bot}</div> : <div className="my-5 text-white bg-bluefield p-5 rounded-3xl max-w-[65%]"><BeatLoader loading={loading} size={10} color="white" margin={3} /></div>}
+                  {content.bot ? <div className="mb-5 text-white bg-blueres p-5 rounded-3xl max-w-[65%]"><Markdown key={index} markdown={content.bot} /></div> : <div className="my-5 text-white bg-bluefield p-5 rounded-3xl max-w-[65%]"><BeatLoader loading={loading} size={10} color="white" margin={3} /></div>}
                 </div>
               </div>
             ))}
