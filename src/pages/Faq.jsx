@@ -14,7 +14,7 @@ import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 env.allowLocalModels = false;
-env.useBrowserCache = false;
+// env.useBrowserCache = false;
 
 const genAI = new GoogleGenerativeAI("AIzaSyDPBX4bbIvXcupKTOc63rfpqismkktMLeU");
 
@@ -39,7 +39,7 @@ function Faq() {
   const navigate = useNavigate();
   const md = new MarkdownIt();
 
-  let classifier = null;
+  // let classifier = null;
 
   useEffect(() => {
     if (!user) {
@@ -74,10 +74,11 @@ function Faq() {
     const fetchModel = async () => {
       try {
         setPageLoading(true);
-        // classifier = await pipeline("sentiment-analysis");
+        classifier = await pipeline("sentiment-analysis");
         const generativeModel = await genAI.getGenerativeModel({
           model: "gemini-1.5-flash",
         });
+
         setModel(generativeModel);
       } catch (error) {
         console.error("Error loading generative model:", error);
@@ -202,6 +203,12 @@ function Faq() {
         ]);
       } catch (error) {
         console.error("Error generating content:", error);
+        setChatContent((prevChatContent) => {
+          const updatedChatContent = [...prevChatContent];
+          updatedChatContent[updatedChatContent.length - 1].bot =
+            "Sorry, I couldn't answer that right now 😞, could you please ask another question?";
+          return updatedChatContent;
+        });
       } finally {
         setLoading(false);
         setPrompt("");
@@ -241,12 +248,7 @@ function Faq() {
       <div className="w-screen min-h-screen flex flex-col font-sans bg-background">
         {pageLoading && (
           <div className="absolute inset-0 flex items-center justify-center bg-opacity-50 bg-black">
-            <BeatLoader
-              loading={pageLoading}
-              size={25}
-              color="white"
-              margin={5}
-            />
+            <BeatLoader loading={loading} size={25} color="white" margin={5} />
           </div>
         )}
         <Navbar />
