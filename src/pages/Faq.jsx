@@ -16,22 +16,10 @@ env.useBrowserCache = false;
 const genAI = new GoogleGenerativeAI("AIzaSyDPBX4bbIvXcupKTOc63rfpqismkktMLeU");
 
 function Faq() {
-  const { user } = useContext(AuthContext);
+  const { userData, user } = useContext(AuthContext);
   const [history, setHistory] = useState(information);
-  // setHistory([...history, 
-  //   {
-  //     role: "user",
-  //     parts: [
-  //       { text: `Data diri: Nama Lengkap: ${user.nama}, Email: ${user.email}`}
-  //     ]
-  //   },
-  //   {
-  //     role: "model",
-  //     parts: [
-  //       { text: "Data diri berhasil kami ingat, Kami akan memberikan informasi seputar Binus University"}
-  //     ]
-  //   },
-  // ])
+
+  
   const [response, setResponse] = useState("");
   const [model, setModel] = useState(null);
   const [prompt, setPrompt] = useState("");
@@ -46,6 +34,22 @@ function Faq() {
   useEffect(() => { 
     if (!user) {
       navigate("/signin");
+    }
+    else {
+      setHistory([...history, 
+        {
+          role: "user",
+          parts: [
+            { text: `Data diri: Nama Lengkap: ${userData.nama}, Email: ${userData.email}`}
+          ]
+        },
+        {
+          role: "model",
+          parts: [
+            { text: "Data diri berhasil kami ingat, Kami akan memberikan informasi seputar Binus University"}
+          ]
+        },
+      ])
     }
   }, []);
 
