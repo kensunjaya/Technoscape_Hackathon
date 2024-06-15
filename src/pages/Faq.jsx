@@ -3,15 +3,13 @@ import { pipeline } from "@xenova/transformers";
 import { information } from "../assets/InformationData";
 import MarkdownIt from "markdown-it";
 import Markdown from "../components/Markdown";
-
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 import { env } from "@xenova/transformers";
 import Navbar from "../components/Navbar";
 import { BeatLoader } from "react-spinners";
-import { AuthContext } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
-
+import { AuthContext } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 env.allowLocalModels = false;
 env.useBrowserCache = false;
@@ -30,7 +28,7 @@ function Faq() {
   const [pageLoading, setPageLoading] = useState(true);
   const [chatContent, setChatContent] = useState([]);
   const [askContinue, setAskContinue] = useState(false);
-  
+
   const textareaRef = useRef(null);
 
   const [timeoutId, setTimeoutId] = useState(null); // State to store the timeout ID
@@ -60,7 +58,7 @@ function Faq() {
             },
           ],
         },
-      ])
+      ]);
       setDisplayname(userData.nama);
     }
   }, []);
@@ -130,7 +128,10 @@ function Faq() {
         setPrompt("");
         console.log(newHistory);
 
-        const chat = model.startChat({ history: newHistory, generationConfig: { } });
+        const chat = model.startChat({
+          history: newHistory,
+          generationConfig: {},
+        });
         const result = await chat.sendMessage(tempPrompt);
         const res = await result.response;
         const text = await res.text(); // Await the text response
@@ -146,7 +147,7 @@ function Faq() {
           { role: "model", parts: [{ text: text }] },
         ]);
       } catch (error) {
-        console.error('Error generating content:', error);
+        console.error("Error generating content:", error);
       } finally {
         setLoading(false);
         setPrompt("");
@@ -162,13 +163,13 @@ function Faq() {
       const result = await classifier(prompt);
       setSentiment(result[0].label);
     } catch (error) {
-      console.error('Error getting sentiment:', error);
-      setSentiment('Error: ' + error.message);
+      console.error("Error getting sentiment:", error);
+      setSentiment("Error: " + error.message);
     }
   };
 
   const handleKeyDown = (event) => {
-    if (event.key === 'Enter' && !event.shiftKey) {
+    if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
       getResponse();
     }
@@ -190,42 +191,72 @@ function Faq() {
           </div>
         )}
         <Navbar />
-        
-        <div className="mx-10 py-5 flex items-end justify-start w-full">
-          <div className="w-full">
-              <div className="w-full">
-                <div className="justify-start flex">
-                  {displayName !== "" ? <div className="mb-5 text-white bg-blueres p-5 rounded-3xl max-w-[65%]">{`Halo ${displayName}👋, apa yang bisa saya bantu hari ini mengenai Binus University?`}</div> : <div className="my-5 text-white bg-bluefield p-5 rounded-3xl max-w-[65%]"><BeatLoader loading={true} size={10} color="white" margin={3} /></div>}
-                </div>
+
+        <div className="mx-auto py-5 items-center justify-center">
+          <div className="w-[100vh]">
+            <div className="w-[100vh]">
+              <div className="justify-start flex">
+                {displayName !== "" ? (
+                  <div className="mb-5 text-white bg-blueres p-5 rounded-3xl max-w-[65%]">{`Halo ${displayName}👋, apa yang bisa saya bantu hari ini mengenai Binus University?`}</div>
+                ) : (
+                  <div className="my-5 text-white bg-bluefield p-5 rounded-3xl max-w-[65%]">
+                    <BeatLoader
+                      loading={true}
+                      size={10}
+                      color="white"
+                      margin={3}
+                    />
+                  </div>
+                )}
               </div>
-            {chatContent.map((content, index) => (
-              <div key={index} className="w-full">
-                <div className="justify-end flex">
-                  <div className="mb-5 text-white bg-blueuser p-5 rounded-3xl max-w-[65%]">{content.user}</div>
+            </div>
+            <div className="flex-1 overflow-y-auto p-5">
+              {chatContent.map((content, index) => (
+                <div key={index} className="w-full">
+                  <div className="justify-end flex">
+                    <div className="mb-5 text-white bg-blueuser p-5 rounded-3xl max-w-[65%]">
+                      {content.user}
+                    </div>
+                  </div>
+                  <div className="justify-start flex">
+                    {content.bot ? (
+                      <div className="mb-5 text-white bg-blueres p-5 rounded-3xl max-w-[65%]">
+                        <Markdown key={index} markdown={content.bot} />
+                      </div>
+                    ) : (
+                      <div className="my-5 text-white bg-bluefield p-5 rounded-3xl max-w-[65%]">
+                        <BeatLoader
+                          loading={loading}
+                          size={10}
+                          color="white"
+                          margin={3}
+                        />
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <div className="justify-start flex">
-                  {content.bot ? <div className="mb-5 text-white bg-blueres p-5 rounded-3xl max-w-[65%]"><Markdown key={index} markdown={content.bot} /></div> : <div className="my-5 text-white bg-bluefield p-5 rounded-3xl max-w-[65%]"><BeatLoader loading={loading} size={10} color="white" margin={3} /></div>}
-                </div>
+              ))}
+            </div>
+            <div className="w-full">
+              <div className="justify-start flex">
+                {askContinue && (
+                  <div className="mb-5 text-white bg-blueres p-5 rounded-3xl max-w-[65%]">{`${displayName}, apakah masih ada yang ingin Anda tanyakan? 😊`}</div>
+                )}
               </div>
-            ))}
-              <div className="w-full">
-                <div className="justify-start flex">
-                  {askContinue && <div className="mb-5 text-white bg-blueres p-5 rounded-3xl max-w-[65%]">{`${displayName}, apakah masih ada yang ingin Anda tanyakan? 😊`}</div>}
-                </div>
-              </div>
-            <div className="flex items-center">  
-              <textarea 
-                id="multiliner" 
-                placeholder="Type something ..." 
-                className="px-3 pt-3 rounded-xl bg-bluefield text-white w-full font-sans mr-5 resize-none overflow-hidden" 
-                value={prompt} 
+            </div>
+            <div className="fixed bottom-0 w-full min-h[4vh] my-4 flex items-center">
+              <textarea
+                id="multiliner"
+                placeholder="Type something ..."
+                className="px-3 pt-3 rounded-xl bg-bluefield text-white min-w-[100vh] font-sans mr-5 resize-none overflow-hidden"
+                value={prompt}
                 onKeyDown={handleKeyDown}
                 onChange={(e) => {
                   setPrompt(e.target.value);
                   if (chatContent.length > 0) {
                     resetTimer();
                   }
-                }} 
+                }}
                 ref={textareaRef}
               />
               <button
