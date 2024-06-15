@@ -1,6 +1,8 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { pipeline } from "@xenova/transformers";
 import { information } from "../assets/InformationData";
+import MarkdownIt from "markdown-it";
+import Markdown from "../components/Markdown";
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
@@ -29,6 +31,8 @@ function Faq() {
   const textareaRef = useRef(null);
 
   const navigate = useNavigate();
+
+  const md = new MarkdownIt();
 
   useEffect(() => {
     if (!user) {
@@ -183,7 +187,7 @@ function Faq() {
                   <div className="justify-start flex">
                     {content.bot ? (
                       <div className="my-5 text-white bg-blueres p-5 rounded-3xl max-w-[65%]">
-                        {content.bot}
+                        <Markdown key={index} markdown={content.bot} />
                       </div>
                     ) : (
                       <div className="my-5 text-white bg-bluefield p-5 rounded-3xl max-w-[65%]">
