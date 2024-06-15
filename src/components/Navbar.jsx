@@ -9,8 +9,10 @@ function Navbar() {
       navigate("/info");
     } else if (title === "FAQ Bot") {
       navigate("/");
-    } else {
+    } else if (title === "History") {
       navigate("/history");
+    } else {
+      navigate("/signin");
     }
   };
   return (
@@ -20,6 +22,7 @@ function Navbar() {
         <Card title="Info University" handleClick={handleClick} />
         <Card title="FAQ Bot" handleClick={handleClick} />
         <Card title="History" handleClick={handleClick} />
+        <Card title="Logout" handleClick={handleClick} />
       </div>
     </nav>
   );
