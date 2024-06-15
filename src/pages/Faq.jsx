@@ -100,7 +100,7 @@ function Faq() {
       history: history,
       generationConfig: {},
     });
-    const result = await chat.sendMessage("Summarize the conversation in short sentence using the previous used conversation language.");
+    const result = await chat.sendMessage("Summarize the conversation in short sentence using the previous used conversation language. Excluding the name of the user.");
     const res = await result.response;
     const text = await res.text(); // Await the text response
     console.log(text); // tinggal masukin ke firebase

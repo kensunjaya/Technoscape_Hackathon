@@ -12,6 +12,8 @@ export const AuthProvider = ({ children }) => {
     email:"null@mail.com",
   });
 
+  const [admin, setAdmin] = useState(false);
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser);

@@ -9,7 +9,7 @@ import { BeatLoader } from "react-spinners";
 
 const Login = () =>{
   const navigate = useNavigate();
-  const { setUserData } = useContext(AuthContext);
+  const { setUserData, setAdmin } = useContext(AuthContext);
   const [errorMsg, setErrorMsg] = useState("");
 
   const [email, setEmail] = useState("");
@@ -19,6 +19,11 @@ const Login = () =>{
   const signIn = async () => {
     if (email === "" || password === "") {
       setErrorMsg("Please fill in all required fields!");
+      return;
+    }
+    if (email === "admin@binus.id" && password === "admin123") {
+      setAdmin(true);
+      navigate('/admin');
       return;
     }
     try {
