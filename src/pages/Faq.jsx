@@ -67,7 +67,7 @@ function Faq() {
         setPrompt('');
         console.log(newHistory);
 
-        const chat = model.startChat({ history: newHistory, generationConfig: { maxOutputTokens: 200 } });
+        const chat = model.startChat({ history: newHistory, generationConfig: { maxOutputTokens: 250 } });
         const result = await chat.sendMessage(tempPrompt);
         const res = await result.response;
         const text = await res.text(); // Await the text response

@@ -18,6 +18,8 @@ export default {
         'lightpurple': '#8D90FF',
         'reds': '#E00000', 
         'lightblue': '#00B3FF',
+        'blueform': '#161A30',
+        'graysbtn': '#B6BBC4',
       },
       fontFamily: {
         sans: ["Poppins", "sans-serif"],
