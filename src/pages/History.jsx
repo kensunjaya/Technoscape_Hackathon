@@ -13,7 +13,7 @@ function History() {
         <div className="mr-64">
           <Navbar />
         </div>
-        History
+        <History description="Sherly" />
       </div>
     </>
   );
