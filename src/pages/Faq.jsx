@@ -107,7 +107,7 @@ function Faq() {
       result = await chat.sendMessage("Describe the category of our conversation in one word only (example: registration).");
     }
     else {
-      result = await chat.sendMessage("Please summarize the conversation. Excluding the user's personal information.");
+      result = await chat.sendMessage("Please summarize the conversation in our conversation language. Excluding the user's personal information.");
     }
     const res = await result.response;
     const text = await res.text(); // Await the text response
