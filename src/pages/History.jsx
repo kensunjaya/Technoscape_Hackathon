@@ -10,7 +10,9 @@ function History() {
         rel="stylesheet"
       ></link>
       <div className="w-screen min-h-screen flex font-sans bg-background">
-        <Navbar />
+        <div className="mr-64">
+          <Navbar />
+        </div>
         History
       </div>
     </>
