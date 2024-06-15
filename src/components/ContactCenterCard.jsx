@@ -14,7 +14,7 @@ function ContactCenterCard(props) {
         <div className="flex flex-col">
           <div className="font-bold text-xl mb-2">{props.title}</div>
           <p className="text-sm">{props.description}</p>
-          <p className="text-sm mt-5">{"Telp:022 – 2056 8888"}</p>
+          <p className="text-sm mt-5">{"Telp: 022 – 2056 8888"}</p>
         </div>
       </button>
     </>
