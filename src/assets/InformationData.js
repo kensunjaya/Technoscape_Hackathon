@@ -15,19 +15,7 @@ export const information =
     {
       role: "user",
       parts: [
-        { text: "Data diri: Nama Lengkap: Kenneth Sunjaya, Email: kennethsunjaya@gmail.com"}
-      ]
-    },
-    {
-      role: "model",
-      parts: [
-        { text: "Data diri berhasil kami ingat, Kami akan memberikan informai seputar Binus University"}
-      ]
-    },
-    {
-      role: "user",
-      parts: [
-        { text: "Tema pembicaraan kita adalah seputar Binus University (Bina Nusantara University)"}
+        { text: "Tema pembicaraan kita adalah seputar Binus University (Bina Nusantara University). Dilarang membahas topik yang lain selain Binus University. Apakah kamu mengerti?"}
       ]
     },
     {

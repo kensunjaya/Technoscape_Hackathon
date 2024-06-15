@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { pipeline } from '@xenova/transformers';
 import { information } from '../assets/InformationData';
 
@@ -7,6 +7,8 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { env } from '@xenova/transformers';
 import Navbar from '../components/Navbar';
 import { BeatLoader } from "react-spinners";
+import { AuthContext } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 env.allowLocalModels = false;
 env.useBrowserCache = false;
@@ -14,16 +16,43 @@ env.useBrowserCache = false;
 const genAI = new GoogleGenerativeAI("AIzaSyDPBX4bbIvXcupKTOc63rfpqismkktMLeU");
 
 function Faq() {
+  const { user } = useContext(AuthContext);
+  const [history, setHistory] = useState(information);
+  // setHistory([...history, 
+  //   {
+  //     role: "user",
+  //     parts: [
+  //       { text: `Data diri: Nama Lengkap: ${user.nama}, Email: ${user.email}`}
+  //     ]
+  //   },
+  //   {
+  //     role: "model",
+  //     parts: [
+  //       { text: "Data diri berhasil kami ingat, Kami akan memberikan informasi seputar Binus University"}
+  //     ]
+  //   },
+  // ])
   const [response, setResponse] = useState("");
   const [model, setModel] = useState(null);
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
+  const [pageLoading, setPageLoading] = useState(true);
   const [chatContent, setChatContent] = useState([]);
-  const [history, setHistory] = useState(information);
+  
   const textareaRef = useRef(null);
+
+  const navigate = useNavigate();
+
+  useEffect(() => { 
+    if (!user) {
+      navigate("/signin");
+    }
+  }, []);
+
 
   useEffect(() => {
     // Fetch the generative model when the component mounts
+
     const fetchModel = async () => {
       try {
         setLoading(true);
@@ -33,6 +62,7 @@ function Faq() {
         console.error('Error loading generative model:', error);
       } finally {
         setLoading(false);
+        setPageLoading(false);
       }
     };
     fetchModel();
@@ -110,12 +140,18 @@ function Faq() {
   };
 
   return (
+    
     <>
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" />
       <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet"></link>
       
       <div className="w-screen min-h-screen flex font-sans bg-background">
+        {pageLoading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-opacity-50 bg-black">
+            <BeatLoader loading={loading} size={25} color="white" margin={5}/>
+          </div>
+        )}
         <Navbar />
         
         <div className="mx-10 py-5 flex items-end justify-start">

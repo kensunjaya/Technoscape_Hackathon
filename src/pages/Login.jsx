@@ -9,7 +9,7 @@ import { BeatLoader } from "react-spinners";
 
 const Login = () =>{
   const navigate = useNavigate();
-  const user = useContext(AuthContext);
+  const { setUserData } = useContext(AuthContext);
   const [errorMsg, setErrorMsg] = useState("");
 
   const [email, setEmail] = useState("");
@@ -28,7 +28,7 @@ const Login = () =>{
         password
       );
       const userData = await getUser();
-      user.setUserData(userData);
+      setUserData(userData);
       setErrorMsg("");
       navigate("/")
     } catch (error) {
