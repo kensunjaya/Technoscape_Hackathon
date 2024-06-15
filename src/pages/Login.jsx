@@ -57,6 +57,13 @@ const Login = () => {
     }
   };
 
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      signIn();
+    }
+  };
+
   return (
     <div className="w-screen h-screen flex justify-center items-center bg-background font-sans">
       <form className="form-content p-10 min-w-[40vh] bg-bluepale rounded-xl bg-blueform">
@@ -70,24 +77,11 @@ const Login = () => {
         )}
 
         <div className="form-group pb-5 w-full">
-          <input
-            type="email"
-            id="formEmail"
-            placeholder="email"
-            className="p-3 rounded-xl bg-bluefield text-white w-full"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
+
+          <input onKeyDown={handleKeyDown} type="email" id="formEmail" placeholder="email" className="p-3 rounded-xl bg-bluefield text-white w-full" value={email} onChange={(e) => setEmail(e.target.value)} />
         </div>
         <div className="form-group pb-5 min-w-[20rem]">
-          <input
-            type="password"
-            id="formPassword"
-            placeholder="password"
-            className="p-3 rounded-xl bg-bluefield text-white w-full"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+          <input onKeyDown={handleKeyDown} type="password" id="formPassword" placeholder="password" className="p-3 rounded-xl bg-bluefield text-white w-full" value={password} onChange={(e) => setPassword(e.target.value)} />
         </div>
 
         {errorMsg !== "" && <div className="text-red-400 mb-5">{errorMsg}</div>}
