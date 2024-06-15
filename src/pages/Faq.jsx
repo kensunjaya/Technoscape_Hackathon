@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { pipeline } from '@xenova/transformers';
+import { information } from '../assets/InformationData';
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
@@ -18,6 +19,7 @@ function Faq() {
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
   const [chatContent, setChatContent] = useState([]);
+  const [history, setHistory] = useState(information);
   const textareaRef = useRef(null);
 
   useEffect(() => {
@@ -43,7 +45,7 @@ function Faq() {
   const adjustTextareaHeight = () => {
     const textarea = textareaRef.current;
     textarea.style.height = "auto"; // Reset the height
-    textarea.style.height = `${textarea.scrollHeight + 10}px`; // Set it to the scrollHeight
+    textarea.style.height = `${textarea.scrollHeight + 10}px`;
   };
 
   const getResponse = async () => {
@@ -54,17 +56,22 @@ function Faq() {
       }
       try {
         setLoading(true);
-        // Add the user's prompt to the chat content
+        // Add the user's prompt to the chat content and history
         setChatContent(prevChatContent => [
           ...prevChatContent,
           { user: prompt, bot: "" }
         ]);
+        const newHistory = [...history, { role: "user", parts: [{ text: prompt }] }];
+        setHistory(newHistory);
         const tempPrompt = prompt;
         setPrompt('');
-        const result = await model.generateContent(tempPrompt);
+        console.log(newHistory);
+
+        const chat = model.startChat({ history: newHistory, generationConfig: { maxOutputTokens: 200 } });
+        const result = await chat.sendMessage(tempPrompt);
         const res = await result.response;
         const text = await res.text(); // Await the text response
-        
+
         setResponse(text);
         // Update the bot response in the chat content
         setChatContent(prevChatContent => {
@@ -72,10 +79,14 @@ function Faq() {
           updatedChatContent[updatedChatContent.length - 1].bot = text;
           return updatedChatContent;
         });
+        setHistory(prevHistory => [
+          ...prevHistory,
+          { role: "model", parts: [{ text: text }] }
+        ]);
 
       } catch (error) {
         console.error('Error generating content:', error);
-        setResponse('Error: ', error.message);
+        setResponse('Error: ' + error.message);
       } finally {
         setLoading(false);
         setPrompt('');
@@ -94,7 +105,7 @@ function Faq() {
       setResponse(result[0].label);
     } catch (error) {
       console.error('Error getting sentiment:', error);
-      setResponse('Error: ', error.message);
+      setResponse('Error: ' + error.message);
     }
   };
 
@@ -120,7 +131,7 @@ function Faq() {
               </div>
             ))}
             <div className="flex items-center">  
-            <textarea 
+              <textarea 
                 id="multiliner" 
                 placeholder="Type something ..." 
                 className="px-3 pt-3 rounded-xl bg-bluefield text-white min-w-[100vh] font-sans mr-5 resize-none overflow-hidden" 
