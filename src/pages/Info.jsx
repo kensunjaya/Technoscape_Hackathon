@@ -1,4 +1,7 @@
 import Navbar from "../components/Navbar";
+import React from "react";
+import BinusUniversityLogo from "../assets/BinusUniversityLogo.png";
+import ImageCaroulser from "../components/ImageCaroulser";
 
 function Info() {
   return (
@@ -11,7 +14,14 @@ function Info() {
       ></link>
       <div className="w-screen min-h-screen flex font-sans bg-background">
         <Navbar />
-        Info
+        <div className="flex flex-col items-center justify-start w-full">
+          <img
+            src={BinusUniversityLogo}
+            alt="Binus University Logo"
+            className="w-32 my-10 object-contain"
+          />
+          <ImageCaroulser />
+        </div>
       </div>
     </>
   );
