@@ -17,3 +17,9 @@ Run the website
 ```
 npm run dev
 ```
+
+### Admin credential
+```
+email : admin@binus.id
+pass  : admin123
+```
