@@ -12,29 +12,5 @@ export const information =
         { text: "Program Description: Memiliki pemahaman dan penguasaan Computer Science (Teknik Informatika) merupakan sebuah kunci utama dalam menghadapi tantangan dunia global saat ini. Perkembangan yang sangat cepat di berbagai sektor industri dan ICT membutuhkan banyak sumber daya manusia (SDM)/ talent yang berperan penting sebagai inisiator teknologi dengan solusi yang kreatif. Program Computer Science menekankan pada beberapa bidang spesifik yang menjadi pilihan bagi mahasiswa, diantaranya Intelligent Systems, Database Technology, Interactive Multimedia, Software Engineering, dan Network Technology. Prospective Career:Software Engineer/Developer, Machine Learning Engineer, Data Scientist/Analyst, Web Engineer/ Developer, Mobile Developer, System Analyst/Developer, Network Specialist, Database Specialist, IT Consultant, Multimedia Programmer, Lecturer/Trainer, Techno-preneur" }
       ]
     },
-    {
-      role: "user",
-      parts: [
-        { text: "Tema pembicaraan kita adalah seputar Binus University (Bina Nusantara University). Dilarang membahas topik yang lain selain Binus University. Apakah kamu mengerti?"}
-      ]
-    },
-    {
-      role: "model",
-      parts: [
-        { text: "Baik, mulai dari sekarang saya akan hanya membahas seputar Bina Nusantara University. Saya tidak akan menjawab pertanyaan di luar topik Binus University"}
-      ]
-    },
-    {
-      role: "user",
-      parts: [
-        { text: "Saya ingin Anda mengerti semua bahasa yang saya gunakan. Apakah Anda mengerti?"}
-      ]
-    },
-    {
-      role: "model",
-      parts: [
-        { text: "Baik, dimengerti. Saya akan mencoba untuk memahami semua bahasa yang Anda gunakan"}
-      ]
-    }
     // ini nanti diisi sama info info binus
   ]
